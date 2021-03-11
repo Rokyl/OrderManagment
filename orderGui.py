@@ -1,18 +1,24 @@
+from PyQt5.QtCore import QDir
 
-from PyQt5 import QtCore, QtWidgets
+import OrderLogic
+from OrderLogic import Order
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
+        MainWindow.resize(624, 319)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
-        self.tableWidget.setGeometry(QtCore.QRect(20, 0, 531, 192))
-        self.tableWidget.setRowCount(0)
+        self.tableWidget.setGeometry(QtCore.QRect(0, 0, 621, 271))
+        self.tableWidget.setRowCount(1)
         self.tableWidget.setColumnCount(5)
         self.tableWidget.setObjectName("tableWidget")
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -23,22 +29,25 @@ class Ui_MainWindow(object):
         self.tableWidget.setHorizontalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(4, item)
-        self.scrollArea = QtWidgets.QScrollArea(self.centralwidget)
-        self.scrollArea.setGeometry(QtCore.QRect(740, 0, 20, 401))
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setObjectName("scrollArea")
-        self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 18, 399))
-        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-        self.scrollArea.raise_()
-        self.tableWidget.raise_()
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setItem(0, 0, item)
+        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setGeometry(QtCore.QRect(80, 140, 113, 21))
+        self.lineEdit.setObjectName("lineEdit")
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton.setGeometry(QtCore.QRect(190, 130, 113, 32))
+        self.pushButton.setObjectName("pushButton")
+        self.pushButton.clicked.connect(self.addnum)
+        self.pushButton1 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton1.setGeometry(QtCore.QRect(190, 130, 143, 62))
+        self.pushButton1.setObjectName("info")
+        self.pushButton1.clicked.connect(self.infonum)
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 24))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 624, 24))
         self.menubar.setObjectName("menubar")
         self.menufile = QtWidgets.QMenu(self.menubar)
         self.menufile.setObjectName("menufile")
@@ -65,9 +74,32 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+    def addnum(self):
+        dialog = QInputDialog()
+        num, ok1 = dialog.getInt(dialog, "Номер заказа", "Введите номер заказа:", QLineEdit.Normal)
+        name, ok2 = dialog.getText(dialog, "Данные заказчика", "Введите данные заказчика:", QLineEdit.Normal)
+        cost, ok3 = dialog.getInt(dialog, 'Стоимость заказа', "Введите стоимость заказа:", QLineEdit.Normal)
+        OrderLogic.adder(num, name, cost=cost)
+
+    def infonum(self):
+        dialog = QInputDialog()
+        num, ok = dialog.getInt(dialog, 'Номер заказа', 'Введите номер заказа:', QLineEdit.Normal)
+        self.QMB(num)
+
+    def QMB(self, num):
+        data = OrderLogic.loaddb('order', num)
+        QMSG = QMessageBox()
+        QMSG.setWindowTitle("Информация о заказчике")
+        QMSG.setText(f"{data}")
+        QMSG.setIcon(QMessageBox.Information)
+
+        QMSG.exec_()
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        item = self.tableWidget.verticalHeaderItem(0)
+        item.setText(_translate("MainWindow", "New Row"))
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Номер заказа"))
         item = self.tableWidget.horizontalHeaderItem(1)
@@ -78,6 +110,12 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Заказ"))
         item = self.tableWidget.horizontalHeaderItem(4)
         item.setText(_translate("MainWindow", "Состояние"))
+        __sortingEnabled = self.tableWidget.isSortingEnabled()
+        self.tableWidget.setSortingEnabled(False)
+        item = self.tableWidget.item(0, 0)
+        item.setText(_translate("MainWindow", "Лол"))
+        self.tableWidget.setSortingEnabled(__sortingEnabled)
+        self.pushButton.setText(_translate("MainWindow", "PushButton"))
         self.menufile.setTitle(_translate("MainWindow", "file"))
         self.actionNew_table.setText(_translate("MainWindow", "New table"))
         self.actionOpen.setText(_translate("MainWindow", "Open"))
@@ -88,6 +126,7 @@ class Ui_MainWindow(object):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
