@@ -94,7 +94,7 @@ class Ui_MainWindow(object):
             try:
                 if ok:
                     self.checkstatus(num)
-                    break
+                break
             except IndexError:
                 QMSG = QMessageBox()
                 QMSG.setWindowTitle("Ошибка")
