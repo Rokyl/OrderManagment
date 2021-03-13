@@ -1,28 +1,40 @@
 import pickle
 
+from PyQt5.QtWidgets import QMessageBox
+
 N = 0
 
 
 class Order:
-    def __init__(self, num, name=None, flag=False, cost=0):
+    def __init__(self, num, name=None, flag=False, cost=0, args=None):
         self.name = name
-        self.num = num
+        self.num = num + 1
         self.flag = flag
         self.cost = cost
-        # self.orders = args
+        self.orders = args
 
     def __repr__(self):
-        return f'{self.num}, {self.name}, {self.cost}'
+        return f'{self.num}, {self.name}, {self.cost}, {self.flag}'
+
+    def separator(self):
+        K = dict(name=self.name, cost=self.cost, args=self.orders, flag=self.flag, num=self.num)
+        return K
+
+    def changeflag(self):
+        dbfile = open('order', 'rb')
+        bd = pickle.load(dbfile)
+        dbfile.close()
+        bd[self - 1].flag = not bd[self - 1].flag
+        updatedb(bd)
 
 
-def adder(num, name=None, flag=False, cost=0):
+def adder(num, name=None, cost=0, args=None, flag=False):
     dbfile = open('order', 'rb')
     bd = pickle.load(dbfile)
     dbfile.close()
-
-    bd.append(Order(num, name, cost=cost))
+    num -= 1
+    bd.append(Order(num, name, cost=cost, args=args, flag=flag))
     updatedb(bd)
-
 
 def cleardb():
     dbfile = open('order', 'wb')
@@ -35,17 +47,14 @@ def updatedb(bd):
     pickle.dump(bd, dbfile)
     dbfile.close()
 
-    # cleardb()
 
-
-def loaddb(nameof,x):
+def loaddb(nameof, x):
     dbfile = open(f'{nameof}', 'rb')
     bd = pickle.load(dbfile)
     dbfile.close()
+    x -= 1
     return bd[x]
 
 
 if __name__ == '__main__':
-    adder(1, 'Bob', cost=1000)
-    adder(2, 'Sue', cost=1000)
-
+    pass

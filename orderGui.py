@@ -1,47 +1,30 @@
-from PyQt5.QtCore import QDir
-
+FLAG_CONST=False
 import OrderLogic
 from OrderLogic import Order
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox
+from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QDialogButtonBox
 
 
 class Ui_MainWindow(object):
+
     def setupUi(self, MainWindow):
+        '''Creating GUI om MainWindow'''
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(624, 319)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
-        self.tableWidget.setGeometry(QtCore.QRect(0, 0, 621, 271))
-        self.tableWidget.setRowCount(1)
-        self.tableWidget.setColumnCount(5)
-        self.tableWidget.setObjectName("tableWidget")
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(3, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(4, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setItem(0, 0, item)
-        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit.setGeometry(QtCore.QRect(80, 140, 113, 21))
-        self.lineEdit.setObjectName("lineEdit")
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(190, 130, 113, 32))
-        self.pushButton.setObjectName("pushButton")
+        self.pushButton.setGeometry(QtCore.QRect(100, 130, 113, 32))
+        self.pushButton.setObjectName("addOrder")
         self.pushButton.clicked.connect(self.addnum)
         self.pushButton1 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton1.setGeometry(QtCore.QRect(190, 130, 143, 62))
-        self.pushButton1.setObjectName("info")
-        self.pushButton1.clicked.connect(self.infonum)
+        self.pushButton1.setGeometry(QtCore.QRect(450, 130, 113, 32))
+        self.pushButton1.setObjectName("infoOrder")
+        self.pushButton1.clicked.connect(self.infocheck)
+        self.pushButton2 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton2.setGeometry(QtCore.QRect(200, 130, 180, 32))
+        self.pushButton2.setObjectName("clearallOrders")
+        self.pushButton2.clicked.connect(self.clearall)
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -52,18 +35,20 @@ class Ui_MainWindow(object):
         self.menufile = QtWidgets.QMenu(self.menubar)
         self.menufile.setObjectName("menufile")
         MainWindow.setMenuBar(self.menubar)
-        self.actionNew_table = QtWidgets.QAction(MainWindow)
-        self.actionNew_table.setObjectName("actionNew_table")
-        self.actionOpen = QtWidgets.QAction(MainWindow)
-        self.actionOpen.setObjectName("actionOpen")
+        self.action1 = QtWidgets.QAction(MainWindow)
+        self.action1.setObjectName("actionNew_table")
+        self.action1.setCheckable(True)
+        self.action2 = QtWidgets.QAction(MainWindow)
+        self.action2.setObjectName("actionOpen")
+        self.action2.setCheckable(True)
         self.actionSave_us = QtWidgets.QAction(MainWindow)
         self.actionSave_us.setObjectName("actionSave_us")
         self.actionPrint_table = QtWidgets.QAction(MainWindow)
         self.actionPrint_table.setObjectName("actionPrint_table")
         self.actionClose = QtWidgets.QAction(MainWindow)
         self.actionClose.setObjectName("actionClose")
-        self.menufile.addAction(self.actionNew_table)
-        self.menufile.addAction(self.actionOpen)
+        self.menufile.addAction(self.action1)
+        self.menufile.addAction(self.action2)
         self.menufile.addSeparator()
         self.menufile.addAction(self.actionSave_us)
         self.menufile.addAction(self.actionPrint_table)
@@ -75,50 +60,117 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def addnum(self):
+        '''Add new order to databse'''
+        global ok1
         dialog = QInputDialog()
-        num, ok1 = dialog.getInt(dialog, "Номер заказа", "Введите номер заказа:", QLineEdit.Normal)
-        name, ok2 = dialog.getText(dialog, "Данные заказчика", "Введите данные заказчика:", QLineEdit.Normal)
-        cost, ok3 = dialog.getInt(dialog, 'Стоимость заказа', "Введите стоимость заказа:", QLineEdit.Normal)
-        OrderLogic.adder(num, name, cost=cost)
+        '''Exception processing'''
+        while True:
 
-    def infonum(self):
+            try:
+                num, ok1 = dialog.getInt(dialog, "Номер заказа", "Введите номер заказа:", QLineEdit.Normal)
+                if ok1:
+                    data = OrderLogic.loaddb('order', num)
+
+                    QMSG = QMessageBox()
+                    QMSG.setWindowTitle("Ошибка")
+                    QMSG.setText('Заказ уже существует, введите другой номер')
+                    QMSG.exec_()
+                else: break
+
+            except IndexError:
+                if ok1:
+                    name, ok2 = dialog.getText(dialog, "Данные заказчика", "Введите данные заказчика:", QLineEdit.Normal)
+                    if ok2:
+                        cost, ok3 = dialog.getDouble(dialog, 'Стоимость заказа', "Введите стоимость заказа:", QLineEdit.Normal)
+                        if ok3:
+                            args, ok4 = dialog.getText(dialog, 'Номера заказов', 'Введите заказы', QLineEdit.Normal)
+                            if ok4:
+                                OrderLogic.adder(num, name, cost=cost, flag=False, args=args)
+                break
+    def infocheck(self):
+        '''Checking database for an order'''
         dialog = QInputDialog()
         num, ok = dialog.getInt(dialog, 'Номер заказа', 'Введите номер заказа:', QLineEdit.Normal)
-        self.QMB(num)
 
-    def QMB(self, num):
+        while True:
+            try:
+                if ok:
+                    self.checkstatus(num)
+                    break
+            except IndexError:
+                QMSG = QMessageBox()
+                QMSG.setWindowTitle("Ошибка")
+                QMSG.setText('Такого заказа нету в базе, попробуйте еще раз?')
+                QMSG.exec_()
+                num, ok = dialog.getInt(dialog, 'Номер заказа', 'Введите номер заказа:', QLineEdit.Normal)
+
+
+
+
+
+    def checkstatus(self, num):
         data = OrderLogic.loaddb('order', num)
+        global SeparData
+        SeparData = OrderLogic.Order.separator(data)
+
+        if SeparData['flag']:
+            QMSG = QMessageBox()
+            QMSG.setWindowTitle("Информация о заказчике")
+            QMSG.setText('Заказ уже забран, узнать информацию все равно?')
+            QMSG.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+            QMSG.buttonClicked.connect(self.StAct)
+
+            QMSG.exec_()
+        else:
+            self.QMB(SeparData)
+
+    def StAct(self, btn):
+        if btn.text() == 'OK':
+            global SeparData
+            self.QMB(SeparData)
+
+    def QMB(self, SeparData):
         QMSG = QMessageBox()
         QMSG.setWindowTitle("Информация о заказчике")
-        QMSG.setText(f"{data}")
+        QMSG.setText(
+            f"Имя заказчика:{SeparData['name']}\nСтоимость заказа:{SeparData['cost']} рублей\n"
+            f"Номера заказов:{SeparData['args']}"
+        )
         QMSG.setIcon(QMessageBox.Information)
+        CHB = QtWidgets.QCheckBox(QMSG)
+        CHB.setText("Заказ отдан")
+        CHB.setGeometry(QtCore.QRect(100, 70, 100, 20))
 
+        if CHB.isChecked:
+
+            if not SeparData['flag']:
+                CHB.setChecked(True)
+                Order.changeflag(SeparData['num'])
         QMSG.exec_()
+
+    def clearall(self):
+        really = QMessageBox()
+        really.setIcon(QMessageBox.Question)
+        really.setText('Вы действительно хотите удалить все данные?')
+        really.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        really.buttonClicked.connect(self.clearaction)
+        really.exec_()
+
+    def clearaction(self, btn):
+        if btn.text() == 'OK':
+            OrderLogic.cleardb()
+        else:
+            pass
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        item = self.tableWidget.verticalHeaderItem(0)
-        item.setText(_translate("MainWindow", "New Row"))
-        item = self.tableWidget.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Номер заказа"))
-        item = self.tableWidget.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Заказчик"))
-        item = self.tableWidget.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "Стоимость"))
-        item = self.tableWidget.horizontalHeaderItem(3)
-        item.setText(_translate("MainWindow", "Заказ"))
-        item = self.tableWidget.horizontalHeaderItem(4)
-        item.setText(_translate("MainWindow", "Состояние"))
-        __sortingEnabled = self.tableWidget.isSortingEnabled()
-        self.tableWidget.setSortingEnabled(False)
-        item = self.tableWidget.item(0, 0)
-        item.setText(_translate("MainWindow", "Лол"))
-        self.tableWidget.setSortingEnabled(__sortingEnabled)
-        self.pushButton.setText(_translate("MainWindow", "PushButton"))
-        self.menufile.setTitle(_translate("MainWindow", "file"))
-        self.actionNew_table.setText(_translate("MainWindow", "New table"))
-        self.actionOpen.setText(_translate("MainWindow", "Open"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Управление заказами v 0.0.2"))
+        self.pushButton.setText(_translate("MainWindow", "Добавить"))
+        self.pushButton1.setText(_translate("MainWindow", "Информация"))
+        self.pushButton2.setText(_translate("MainWindow", "Удалить базу данных"))
+        self.menufile.setTitle(_translate("MainWindow", "Файл"))
+        self.action1.setText(_translate("MainWindow", "Новая запись в таблице"))
+        self.action2.setText(_translate("MainWindow", "Инфо о записи"))
         self.actionSave_us.setText(_translate("MainWindow", "Save us"))
         self.actionPrint_table.setText(_translate("MainWindow", "Print table"))
         self.actionClose.setText(_translate("MainWindow", "Close"))
