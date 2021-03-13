@@ -37,10 +37,8 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
         self.action1 = QtWidgets.QAction(MainWindow)
         self.action1.setObjectName("actionNew_table")
-        self.action1.setCheckable(True)
         self.action2 = QtWidgets.QAction(MainWindow)
         self.action2.setObjectName("actionOpen")
-        self.action2.setCheckable(True)
         self.actionSave_us = QtWidgets.QAction(MainWindow)
         self.actionSave_us.setObjectName("actionSave_us")
         self.actionPrint_table = QtWidgets.QAction(MainWindow)
@@ -55,7 +53,7 @@ class Ui_MainWindow(object):
         self.menufile.addSeparator()
         self.menufile.addAction(self.actionClose)
         self.menubar.addAction(self.menufile.menuAction())
-
+        self.action1.triggered.connect(self.addnum)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
