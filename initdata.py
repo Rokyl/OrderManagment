@@ -1,10 +1,12 @@
 '''self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
         self.tableWidget.setGeometry(QtCore.QRect(0, 0, 621, 271))
-        self.tableWidget.setRowCount(1)
+        self.tableWidget.setRowCount(self.tablewidget())
         self.tableWidget.setColumnCount(5)
         self.tableWidget.setObjectName("tableWidget")
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setVerticalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -51,7 +53,7 @@ self.pushButton2.clicked.connect(self.clearall)
 
 
 
-K = '1, 67, 87, 90, 82'
+K = '1,67,87,90,2'
     num = 0
     num2 = 0
     for x in K:

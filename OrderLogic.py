@@ -1,7 +1,5 @@
 import pickle
 
-from PyQt5.QtWidgets import QMessageBox
-
 N = 0
 
 
@@ -17,7 +15,7 @@ class Order:
         return f'{self.num}, {self.name}, {self.cost}, {self.flag}'
 
     def separator(self):
-        K = dict(name=self.name, cost=self.cost, args=self.orders, flag=self.flag, num=self.num)
+        K = dict(name=self.name, cost=self.cost, order=self.orders, flag=self.flag, num=self.num)
         return K
 
     def changeflag(self):
@@ -35,6 +33,7 @@ def adder(num, name=None, cost=0, args=None, flag=False):
     num -= 1
     bd.append(Order(num, name, cost=cost, args=args, flag=flag))
     updatedb(bd)
+
 
 def cleardb():
     dbfile = open('order', 'wb')
@@ -54,6 +53,16 @@ def loaddb(nameof, x):
     dbfile.close()
     x -= 1
     return bd[x]
+
+
+def checkcount(nameof):
+    dbfile = open(f'{nameof}', 'rb')
+    bd = pickle.load(dbfile)
+    dbfile.close()
+    n = 0
+    for x in bd:
+        n += 1
+    return n
 
 
 if __name__ == '__main__':
