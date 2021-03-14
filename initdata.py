@@ -16,7 +16,7 @@
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(4, item)
         item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setItem(0, 0, item)'''
+        self.tableWidget.setItem(0, 0, item)
 
 item = self.tableWidget.verticalHeaderItem(0)
 item.setText(_translate("MainWindow", "New Row"))
@@ -35,7 +35,18 @@ self.tableWidget.setSortingEnabled(False)
 item = self.tableWidget.item(0, 0)
 item.setText(_translate("MainWindow", "Лол"))
 self.tableWidget.setSortingEnabled(__sortingEnabled)
-
+self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+self.pushButton.setGeometry(QtCore.QRect(100, 130, 113, 32))
+self.pushButton.setObjectName("addOrder")
+self.pushButton.clicked.connect(self.addnum)
+self.pushButton1 = QtWidgets.QPushButton(self.centralwidget)
+self.pushButton1.setGeometry(QtCore.QRect(450, 130, 113, 32))
+self.pushButton1.setObjectName("infoOrder")
+self.pushButton1.clicked.connect(self.infocheck)
+self.pushButton2 = QtWidgets.QPushButton(self.centralwidget)
+self.pushButton2.setGeometry(QtCore.QRect(200, 130, 180, 32))
+self.pushButton2.setObjectName("clearallOrders")
+self.pushButton2.clicked.connect(self.clearall)
 
 
 
@@ -94,4 +105,5 @@ if SeparData['flag']:
 
     QMSG.exec_()
 else:
-    self.QMB(SeparData)
+    self.infoMessageBox(SeparData)
+'''

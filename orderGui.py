@@ -1,4 +1,4 @@
-FLAG_CONST=False
+
 import OrderLogic
 from OrderLogic import Order
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -8,23 +8,12 @@ from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QDialogButtonB
 class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
-        '''Creating GUI om MainWindow'''
+        '''Creating GUI on MainWindow'''
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(624, 319)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(100, 130, 113, 32))
-        self.pushButton.setObjectName("addOrder")
-        self.pushButton.clicked.connect(self.addnum)
-        self.pushButton1 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton1.setGeometry(QtCore.QRect(450, 130, 113, 32))
-        self.pushButton1.setObjectName("infoOrder")
-        self.pushButton1.clicked.connect(self.infocheck)
-        self.pushButton2 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton2.setGeometry(QtCore.QRect(200, 130, 180, 32))
-        self.pushButton2.setObjectName("clearallOrders")
-        self.pushButton2.clicked.connect(self.clearall)
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -36,11 +25,11 @@ class Ui_MainWindow(object):
         self.menufile.setObjectName("menufile")
         MainWindow.setMenuBar(self.menubar)
         self.action1 = QtWidgets.QAction(MainWindow)
-        self.action1.setObjectName("actionNew_table")
+        self.action1.setObjectName("action1")
         self.action2 = QtWidgets.QAction(MainWindow)
-        self.action2.setObjectName("actionOpen")
-        self.actionSave_us = QtWidgets.QAction(MainWindow)
-        self.actionSave_us.setObjectName("actionSave_us")
+        self.action2.setObjectName("action2")
+        self.action3 = QtWidgets.QAction(MainWindow)
+        self.action3.setObjectName("action3")
         self.actionPrint_table = QtWidgets.QAction(MainWindow)
         self.actionPrint_table.setObjectName("actionPrint_table")
         self.actionClose = QtWidgets.QAction(MainWindow)
@@ -48,12 +37,14 @@ class Ui_MainWindow(object):
         self.menufile.addAction(self.action1)
         self.menufile.addAction(self.action2)
         self.menufile.addSeparator()
-        self.menufile.addAction(self.actionSave_us)
+        self.menufile.addAction(self.action3)
         self.menufile.addAction(self.actionPrint_table)
         self.menufile.addSeparator()
         self.menufile.addAction(self.actionClose)
         self.menubar.addAction(self.menufile.menuAction())
         self.action1.triggered.connect(self.addnum)
+        self.action2.triggered.connect(self.infocheck)
+        self.action3.triggered.connect(self.clearall)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -107,10 +98,10 @@ class Ui_MainWindow(object):
 
 
     def checkstatus(self, num):
+        '''Проверка статуса заказа'''
         data = OrderLogic.loaddb('order', num)
         global SeparData
         SeparData = OrderLogic.Order.separator(data)
-
         if SeparData['flag']:
             QMSG = QMessageBox()
             QMSG.setWindowTitle("Информация о заказчике")
@@ -120,33 +111,42 @@ class Ui_MainWindow(object):
 
             QMSG.exec_()
         else:
-            self.QMB(SeparData)
+            self.infoMessageBox()
 
     def StAct(self, btn):
+        '''Chech button in MessageBox "Checkstatus"'''
         if btn.text() == 'OK':
             global SeparData
-            self.QMB(SeparData)
+            self.infoMessageBox()
 
-    def QMB(self, SeparData):
+    def infoMessageBox(self):
+
+        global SeparData
         QMSG = QMessageBox()
         QMSG.setWindowTitle("Информация о заказчике")
         QMSG.setText(
             f"Имя заказчика:{SeparData['name']}\nСтоимость заказа:{SeparData['cost']} рублей\n"
             f"Номера заказов:{SeparData['args']}"
         )
+
         QMSG.setIcon(QMessageBox.Information)
         CHB = QtWidgets.QCheckBox(QMSG)
         CHB.setText("Заказ отдан")
         CHB.setGeometry(QtCore.QRect(100, 70, 100, 20))
 
-        if CHB.isChecked:
-
-            if not SeparData['flag']:
-                CHB.setChecked(True)
-                Order.changeflag(SeparData['num'])
+        CHB.stateChanged.connect(self.checkboxisclicked)
+        if SeparData['flag']: #Костыль для закрепления чекбокса во включенном состоянии
+            CHB.setChecked(True)
+            Order.changeflag(SeparData['num'])
         QMSG.exec_()
 
+    def checkboxisclicked(self):
+        '''Checkbox clicked to change flag'''
+        global SeparData
+        Order.changeflag(SeparData['num'])
+
     def clearall(self):
+        '''Dialogbox to clear all data'''
         really = QMessageBox()
         really.setIcon(QMessageBox.Question)
         really.setText('Вы действительно хотите удалить все данные?')
@@ -155,6 +155,7 @@ class Ui_MainWindow(object):
         really.exec_()
 
     def clearaction(self, btn):
+        '''ChechButton "ClearAll"'''
         if btn.text() == 'OK':
             OrderLogic.cleardb()
         else:
@@ -163,13 +164,10 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Управление заказами v 0.0.2"))
-        self.pushButton.setText(_translate("MainWindow", "Добавить"))
-        self.pushButton1.setText(_translate("MainWindow", "Информация"))
-        self.pushButton2.setText(_translate("MainWindow", "Удалить базу данных"))
         self.menufile.setTitle(_translate("MainWindow", "Файл"))
         self.action1.setText(_translate("MainWindow", "Новая запись в таблице"))
         self.action2.setText(_translate("MainWindow", "Инфо о записи"))
-        self.actionSave_us.setText(_translate("MainWindow", "Save us"))
+        self.action3.setText(_translate("MainWindow", "Удалить базу данных"))
         self.actionPrint_table.setText(_translate("MainWindow", "Print table"))
         self.actionClose.setText(_translate("MainWindow", "Close"))
 
