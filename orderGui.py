@@ -6,8 +6,8 @@ from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QVBoxLayout, Q
 
 class Ui_MainWindow(object):
 
-    def setupUi(self, MainWindow):
-        #Creating GUI on MainWindow
+    def setupui(self, MainWindow):
+        # Creating GUI on MainWindow
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(400, 200)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -62,7 +62,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def addnum(self):
-        #Add new order to databse
+        # Add new order to databse
         global ok1
         dialog = QInputDialog()
         '''Exception processing'''
@@ -71,10 +71,10 @@ class Ui_MainWindow(object):
             try:
                 num, ok1 = dialog.getInt(dialog, "Номер заказа", "Введите номер заказа:", QLineEdit.Normal)
                 if ok1:
-                    QMSG = QMessageBox()
-                    QMSG.setWindowTitle("Ошибка")
-                    QMSG.setText('Заказ уже существует, введите другой номер')
-                    QMSG.exec_()
+                    qmsg = QMessageBox()
+                    qmsg.setWindowTitle("Ошибка")
+                    qmsg.setText('Заказ уже существует, введите другой номер')
+                    qmsg.exec_()
                 else:
                     break
 
@@ -92,7 +92,7 @@ class Ui_MainWindow(object):
                 break
 
     def infocheck(self):
-        #Checking database for an order
+        # Checking database for an order
         dialog = QInputDialog()
         num, ok = dialog.getInt(dialog, 'Номер заказа', 'Введите номер заказа:', QLineEdit.Normal)
 
@@ -102,30 +102,30 @@ class Ui_MainWindow(object):
                     self.checkstatus(num)
                 break
             except IndexError:
-                QMSG = QMessageBox()
-                QMSG.setWindowTitle("Ошибка")
-                QMSG.setText('Такого заказа нету в базе, попробуйте еще раз?')
-                QMSG.exec_()
+                qmsg = QMessageBox()
+                qmsg.setWindowTitle("Ошибка")
+                qmsg.setText('Такого заказа нету в базе, попробуйте еще раз?')
+                qmsg.exec_()
                 num, ok = dialog.getInt(dialog, 'Номер заказа', 'Введите номер заказа:', QLineEdit.Normal)
 
     def checkstatus(self, num):
-        #Проверка статуса заказа
+        # Проверка статуса заказа
         data = OrderLogic.loaddb('order', num)
         global SeparData
         SeparData = OrderLogic.Order.separator(data)
         if SeparData['flag']:
-            QMSG = QMessageBox()
-            QMSG.setWindowTitle("Информация о заказчике")
-            QMSG.setText('Заказ уже забран, узнать информацию все равно?')
-            QMSG.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-            QMSG.buttonClicked.connect(self.stact)
+            qmsg = QMessageBox()
+            qmsg.setWindowTitle("Информация о заказчике")
+            qmsg.setText('Заказ уже забран, узнать информацию все равно?')
+            qmsg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+            qmsg.buttonClicked.connect(self.stact)
 
-            QMSG.exec_()
+            qmsg.exec_()
         else:
             self.infomessagebox()
 
     def stact(self, btn):
-        #Chech button in MessageBox "Checkstatus"'''
+        # Chech button in MessageBox "Checkstatus"'''
         if btn.text() == 'OK':
             global SeparData
             self.infomessagebox()
@@ -152,16 +152,16 @@ class Ui_MainWindow(object):
         qmsg.exec_()
 
     def checkboxisclicked(self):
-        #Checkbox clicked to change flag'''
+        # Checkbox clicked to change flag'''
         global SeparData
         Order.changeflag(SeparData['num'])
 
-    def rowTableCount(self):
-        N = OrderLogic.checkcount('order')
-        return N
+    def rowtablecount(self):
+        n = OrderLogic.checkcount('order')
+        return n
 
     def clearall(self):
-        #Dialogbox to clear all data
+        # Dialogbox to clear all data
         really = QMessageBox()
         really.setIcon(QMessageBox.Question)
         really.setText('Вы действительно хотите удалить все данные?')
@@ -170,20 +170,20 @@ class Ui_MainWindow(object):
         really.exec_()
 
     def clearaction(self, btn):
-        #ChechButton "ClearAll"
+        # ChechButton "ClearAll"
         if btn.text() == 'OK':
             OrderLogic.cleardb()
         else:
             pass
 
     def createtable(self):
-        #Creating table of orders
-        TableWindow = QtWidgets.QDialog()
+        # Creating table of orders
+        tablewindow = QtWidgets.QDialog()
         WinGeom = QDesktopWidget().availableGeometry()
-        TableWindow.setGeometry(0, 0, WinGeom.width(), WinGeom.height()-30)
-        self.tableWidget = QtWidgets.QTableWidget(TableWindow)
-        self.tableWidget.setGeometry(QtCore.QRect(0, 0, WinGeom.width(), WinGeom.height()-30))
-        self.tableWidget.setRowCount(self.rowTableCount())
+        tablewindow.setGeometry(0, 0, WinGeom.width(), WinGeom.height() - 30)
+        self.tableWidget = QtWidgets.QTableWidget(tablewindow)
+        self.tableWidget.setGeometry(QtCore.QRect(0, 0, WinGeom.width(), WinGeom.height() - 30))
+        self.tableWidget.setRowCount(self.rowtablecount())
         items = 20
         self.tableWidget.setColumnCount(items + 3)
         self.tableWidget.setObjectName("tableWidget")
@@ -202,22 +202,22 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Стоимость"))
         item = self.tableWidget.horizontalHeaderItem(2)
         item.setText(_translate("MainWindow", "Состояние"))
-        for x in range(self.rowTableCount()):
+        for x in range(self.rowtablecount()):
             data = OrderLogic.loaddb('order', x)
-            SeparData = OrderLogic.Order.separator(data)
+            separdata = OrderLogic.Order.separator(data)
             separOrders = OrderLogic.Order.separateOrders(data)
             item = QtWidgets.QTableWidgetItem()
-            self.tableWidget.setItem(SeparData['num'] - 1, 0, item)
-            item = self.tableWidget.item(SeparData['num'] - 1, 0)
-            item.setText(_translate("MainWindow", f"{SeparData['name']}"))
+            self.tableWidget.setItem(separdata['num'] - 1, 0, item)
+            item = self.tableWidget.item(separdata['num'] - 1, 0)
+            item.setText(_translate("MainWindow", f"{separdata['name']}"))
             item = QtWidgets.QTableWidgetItem()
-            self.tableWidget.setItem(SeparData['num'] - 1, 1, item)
-            item = self.tableWidget.item(SeparData['num'] - 1, 1)
-            item.setText(_translate("MainWindow", f"{SeparData['cost']}"))
+            self.tableWidget.setItem(separdata['num'] - 1, 1, item)
+            item = self.tableWidget.item(separdata['num'] - 1, 1)
+            item.setText(_translate("MainWindow", f"{separdata['cost']}"))
             item = QtWidgets.QTableWidgetItem()
-            self.tableWidget.setItem(SeparData['num'] - 1, 2, item)
-            item = self.tableWidget.item(SeparData['num'] - 1, 2)
-            if SeparData['flag']:
+            self.tableWidget.setItem(separdata['num'] - 1, 2, item)
+            item = self.tableWidget.item(separdata['num'] - 1, 2)
+            if separdata['flag']:
                 item.setText(_translate("MainWindow", "Отдан"))
             else:
                 item.setText(_translate("MainWindow", "Не отдан"))
@@ -226,21 +226,21 @@ class Ui_MainWindow(object):
                 for p in separOrders.keys():
                     if int(p) == i + 1:
                         item = QtWidgets.QTableWidgetItem()
-                        self.tableWidget.setItem(SeparData['num'] - 1, i + 3, item)
-                        item = self.tableWidget.item(SeparData['num'] - 1, i + 3)
+                        self.tableWidget.setItem(separdata['num'] - 1, i + 3, item)
+                        item = self.tableWidget.item(separdata['num'] - 1, i + 3)
                         item.setText(_translate("MainWindow", f"{separOrders[f'{i + 1}']}"))
                         flag = True
                 if not flag:
                     item = QtWidgets.QTableWidgetItem()
-                    self.tableWidget.setItem(SeparData['num'] - 1, i + 3, item)
-                    item = self.tableWidget.item(SeparData['num'] - 1, i + 3)
+                    self.tableWidget.setItem(separdata['num'] - 1, i + 3, item)
+                    item = self.tableWidget.item(separdata['num'] - 1, i + 3)
                     item.setText(_translate("MainWindow", f"0"))
                 item = QtWidgets.QTableWidgetItem()
                 self.tableWidget.setHorizontalHeaderItem(i + 3, item)
                 item = self.tableWidget.horizontalHeaderItem(i + 3)
                 item.setText(_translate("MainWindow", f"{i + 1}"))
 
-        TableWindow.exec_()
+        tablewindow.exec_()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -259,7 +259,6 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
+    ui.setupui(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
