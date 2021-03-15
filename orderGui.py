@@ -1,7 +1,7 @@
 import OrderLogic
 from OrderLogic import Order
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QVBoxLayout
+from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QVBoxLayout, QDesktopWidget
 
 
 class Ui_MainWindow(object):
@@ -182,9 +182,10 @@ class Ui_MainWindow(object):
         '''Creating table of orders'''
         # global flag
         TableWindow = QtWidgets.QDialog()
-        TableWindow.setGeometry(0, 0, 1920, 1080)
+        q = QDesktopWidget().availableGeometry()
+        TableWindow.setGeometry(0, 0, q.width(), q.height()-30)
         self.tableWidget = QtWidgets.QTableWidget(TableWindow)
-        self.tableWidget.setGeometry()
+        self.tableWidget.setGeometry(QtCore.QRect(0, 0, q.width(), q.height()-30))
         self.tableWidget.setRowCount(self.rowTableCount())
         items = 20
         self.tableWidget.setColumnCount(items + 3)
@@ -263,4 +264,8 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
+    q = QDesktopWidget().availableGeometry()
+    print("width =", q.width())
+    print("height =", q.height())
     sys.exit(app.exec_())
+
