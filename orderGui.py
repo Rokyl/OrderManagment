@@ -182,10 +182,10 @@ class Ui_MainWindow(object):
         '''Creating table of orders'''
         # global flag
         TableWindow = QtWidgets.QDialog()
-        q = QDesktopWidget().availableGeometry()
-        TableWindow.setGeometry(0, 0, q.width(), q.height()-30)
+        WinGeom = QDesktopWidget().availableGeometry()
+        TableWindow.setGeometry(0, 0, WinGeom.width(), WinGeom.height()-30)
         self.tableWidget = QtWidgets.QTableWidget(TableWindow)
-        self.tableWidget.setGeometry(QtCore.QRect(0, 0, q.width(), q.height()-30))
+        self.tableWidget.setGeometry(QtCore.QRect(0, 0, WinGeom.width(), WinGeom.height()-30))
         self.tableWidget.setRowCount(self.rowTableCount())
         items = 20
         self.tableWidget.setColumnCount(items + 3)
