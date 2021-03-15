@@ -18,12 +18,12 @@ class Order:
         K = dict(name=self.name, cost=self.cost, order=self.orders, flag=self.flag, num=self.num)
         return K
 
-    def changeflag(self):
-        dbfile = open('order', 'rb')
+    def changeflag(self,path):
+        dbfile = open(path, 'rb')
         bd = pickle.load(dbfile)
         dbfile.close()
         bd[self.num - 1].flag = not bd[self.num - 1].flag
-        updatedb(bd)
+        updatedb(path,bd)
 
     def separateOrders(self):
         lBorder = rBorder = 0
@@ -53,37 +53,52 @@ class Order:
         return dictoforders
 
 
-def adder(num, name=None, cost=0, args=None, flag=False):
-    dbfile = open('order', 'rb')
+def adder(path, num, name=None, cost=0, args=None, flag=False):
+    dbfile = open(path, 'rb')
     bd = pickle.load(dbfile)
     dbfile.close()
     num -= 1
     bd.append(Order(num, name, cost=cost, args=args, flag=flag))
-    updatedb(bd)
-
+    updatedb(path, bd)
+    savefile(path,)
 
 def cleardb():
     dbfile = open('order', 'wb')
     pickle.dump([], dbfile)
     dbfile.close()
-
-
-def updatedb(bd):
+def loadfile(path):
+    dbfile = open(path, 'rb')
+    bd = pickle.load(dbfile)
+    dbfile.close()
     dbfile = open('order', 'wb')
     pickle.dump(bd, dbfile)
     dbfile.close()
 
+def savefile(path):
+    dbfile = open('order', 'rb')
+    bd = pickle.load(dbfile)
+    dbfile.close()
+    dbfile = open(path, 'wb')
+    pickle.dump(bd, dbfile)
+    dbfile.close()
 
-def loaddb(nameof, x):
-    dbfile = open(f'{nameof}', 'rb')
+
+def updatedb(path, bd):
+    dbfile = open(path, 'wb')
+    pickle.dump(bd, dbfile)
+    dbfile.close()
+
+
+def loaddb(path, x):
+    dbfile = open(path, 'rb')
     bd = pickle.load(dbfile)
     dbfile.close()
     x -= 1
     return bd[x]
 
 
-def checkcount(nameof):
-    dbfile = open(f'{nameof}', 'rb')
+def checkcount(path):
+    dbfile = open(path, 'rb')
     bd = pickle.load(dbfile)
     dbfile.close()
     n = 0
@@ -93,6 +108,9 @@ def checkcount(nameof):
 
 
 if __name__ == '__main__':
-    data = loaddb('order', 2)
+    path='order'
+   # adder(path,1, args='1,2,4,5,6')
+    cleardb()
+    data = loaddb(path, 4)
     D = Order.separateOrders(data)
     print(D.keys())
