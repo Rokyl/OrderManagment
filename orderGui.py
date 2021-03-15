@@ -137,6 +137,7 @@ class Ui_MainWindow(object):
         global SeparData
         QMSG = QMessageBox()
         QMSG.setWindowTitle("Информация о заказчике")
+
         QMSG.setText(
             f"Имя заказчика:{SeparData['name']}\nСтоимость заказа:{SeparData['cost']} рублей\n"
             f"Номера заказов:{SeparData['order']}"
@@ -144,7 +145,7 @@ class Ui_MainWindow(object):
         QMSG.setIcon(QMessageBox.Information)
         CHB = QtWidgets.QCheckBox(QMSG)
         CHB.setText("Заказ отдан")
-        CHB.setGeometry(QtCore.QRect(100, 70, 100, 20))
+        CHB.setGeometry(QtCore.QRect(65, 70, 100, 20))
 
         CHB.stateChanged.connect(self.checkboxisclicked)
         if SeparData['flag']:  # Костыль для закрепления чекбокса во включенном состоянии
@@ -178,12 +179,15 @@ class Ui_MainWindow(object):
             pass
 
     def createtable(self):
+        '''Creating table of orders'''
+        # global flag
         TableWindow = QtWidgets.QDialog()
-        TableWindow.setGeometry(500, 500, 400, 200)
+        TableWindow.setGeometry(0, 0, 1920, 1080)
         self.tableWidget = QtWidgets.QTableWidget(TableWindow)
-        self.tableWidget.setGeometry(QtCore.QRect(0, 0, 400, 250))
+        self.tableWidget.setGeometry()
         self.tableWidget.setRowCount(self.rowTableCount())
-        self.tableWidget.setColumnCount(4)
+        items = 20
+        self.tableWidget.setColumnCount(items + 3)
         self.tableWidget.setObjectName("tableWidget")
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
@@ -199,12 +203,11 @@ class Ui_MainWindow(object):
         item = self.tableWidget.horizontalHeaderItem(1)
         item.setText(_translate("MainWindow", "Стоимость"))
         item = self.tableWidget.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "Заказы"))
-        item = self.tableWidget.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Состояние"))
         for x in range(self.rowTableCount()):
             data = OrderLogic.loaddb('order', x)
             SeparData = OrderLogic.Order.separator(data)
+            separOrders = OrderLogic.Order.separateOrders(data)
             item = QtWidgets.QTableWidgetItem()
             self.tableWidget.setItem(SeparData['num'] - 1, 0, item)
             item = self.tableWidget.item(SeparData['num'] - 1, 0)
@@ -216,14 +219,28 @@ class Ui_MainWindow(object):
             item = QtWidgets.QTableWidgetItem()
             self.tableWidget.setItem(SeparData['num'] - 1, 2, item)
             item = self.tableWidget.item(SeparData['num'] - 1, 2)
-            item.setText(_translate("MainWindow", f"{SeparData['order']}"))
-            item = QtWidgets.QTableWidgetItem()
-            self.tableWidget.setItem(SeparData['num'] - 1, 3, item)
-            item = self.tableWidget.item(SeparData['num'] - 1, 3)
             if SeparData['flag']:
                 item.setText(_translate("MainWindow", "Отдан"))
             else:
                 item.setText(_translate("MainWindow", "Не отдан"))
+            for i in range(items):
+                flag = False
+                for p in separOrders.keys():
+                    if int(p) == i + 1:
+                        item = QtWidgets.QTableWidgetItem()
+                        self.tableWidget.setItem(SeparData['num'] - 1, i + 3, item)
+                        item = self.tableWidget.item(SeparData['num'] - 1, i + 3)
+                        item.setText(_translate("MainWindow", f"{separOrders[f'{i + 1}']}"))
+                        flag = True
+                if not flag:
+                    item = QtWidgets.QTableWidgetItem()
+                    self.tableWidget.setItem(SeparData['num'] - 1, i + 3, item)
+                    item = self.tableWidget.item(SeparData['num'] - 1, i + 3)
+                    item.setText(_translate("MainWindow", f"0"))
+                item = QtWidgets.QTableWidgetItem()
+                self.tableWidget.setHorizontalHeaderItem(i + 3, item)
+                item = self.tableWidget.horizontalHeaderItem(i + 3)
+                item.setText(_translate("MainWindow", f"{i + 1}"))
 
         TableWindow.exec_()
 

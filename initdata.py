@@ -109,3 +109,5 @@ if SeparData['flag']:
 else:
     self.infoMessageBox(SeparData)
 '''
+Z='Privet ti dolboeb'
+print(int(Z))
