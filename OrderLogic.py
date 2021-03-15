@@ -28,20 +28,24 @@ class Order:
 
     def separateOrders(self):
         lBorder = rBorder = 0
-        L = []
         dictoforders = {}
         self.orders = self.orders.replace(' ', '')
-
+        commacount = 0
+        for x in self.orders:
+            if x == ',':
+                commacount += 1
         for x in self.orders:
             rBorder += 1
-            if x == ',':
+            if x == ',' or commacount == 0:
                 K = self.orders[lBorder:rBorder - 1]
                 lBorder = rBorder
+                commacount -= 1
+                if commacount == 0:
+                    rBorder = len(self.orders)
                 try:
                     int(K)
                     dictoforders[f'{K}'] = 1
                 except (ValueError):
-
                     a1 = a2 = 0
                     for i in K:
                         a2 += 1

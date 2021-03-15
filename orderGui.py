@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QVBoxLayout, Q
 class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
-        '''Creating GUI on MainWindow'''
+        #Creating GUI on MainWindow
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(400, 200)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -62,7 +62,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def addnum(self):
-        '''Add new order to databse'''
+        #Add new order to databse
         global ok1
         dialog = QInputDialog()
         '''Exception processing'''
@@ -71,8 +71,6 @@ class Ui_MainWindow(object):
             try:
                 num, ok1 = dialog.getInt(dialog, "Номер заказа", "Введите номер заказа:", QLineEdit.Normal)
                 if ok1:
-                    data = OrderLogic.loaddb('order', num)
-
                     QMSG = QMessageBox()
                     QMSG.setWindowTitle("Ошибка")
                     QMSG.setText('Заказ уже существует, введите другой номер')
@@ -94,7 +92,7 @@ class Ui_MainWindow(object):
                 break
 
     def infocheck(self):
-        '''Checking database for an order'''
+        #Checking database for an order
         dialog = QInputDialog()
         num, ok = dialog.getInt(dialog, 'Номер заказа', 'Введите номер заказа:', QLineEdit.Normal)
 
@@ -111,7 +109,7 @@ class Ui_MainWindow(object):
                 num, ok = dialog.getInt(dialog, 'Номер заказа', 'Введите номер заказа:', QLineEdit.Normal)
 
     def checkstatus(self, num):
-        '''Проверка статуса заказа'''
+        #Проверка статуса заказа
         data = OrderLogic.loaddb('order', num)
         global SeparData
         SeparData = OrderLogic.Order.separator(data)
@@ -120,41 +118,41 @@ class Ui_MainWindow(object):
             QMSG.setWindowTitle("Информация о заказчике")
             QMSG.setText('Заказ уже забран, узнать информацию все равно?')
             QMSG.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-            QMSG.buttonClicked.connect(self.StAct)
+            QMSG.buttonClicked.connect(self.stact)
 
             QMSG.exec_()
         else:
-            self.infoMessageBox()
+            self.infomessagebox()
 
-    def StAct(self, btn):
-        '''Chech button in MessageBox "Checkstatus"'''
+    def stact(self, btn):
+        #Chech button in MessageBox "Checkstatus"'''
         if btn.text() == 'OK':
             global SeparData
-            self.infoMessageBox()
+            self.infomessagebox()
 
-    def infoMessageBox(self):
+    def infomessagebox(self):
 
         global SeparData
-        QMSG = QMessageBox()
-        QMSG.setWindowTitle("Информация о заказчике")
+        qmsg = QMessageBox()
+        qmsg.setWindowTitle("Информация о заказчике")
 
-        QMSG.setText(
+        qmsg.setText(
             f"Имя заказчика:{SeparData['name']}\nСтоимость заказа:{SeparData['cost']} рублей\n"
             f"Номера заказов:{SeparData['order']}"
         )
-        QMSG.setIcon(QMessageBox.Information)
-        CHB = QtWidgets.QCheckBox(QMSG)
-        CHB.setText("Заказ отдан")
-        CHB.setGeometry(QtCore.QRect(65, 70, 100, 20))
+        qmsg.setIcon(QMessageBox.Information)
+        chb = QtWidgets.QCheckBox(qmsg)
+        chb.setText("Заказ отдан")
+        chb.setGeometry(QtCore.QRect(65, 70, 100, 20))
 
-        CHB.stateChanged.connect(self.checkboxisclicked)
+        chb.stateChanged.connect(self.checkboxisclicked)
         if SeparData['flag']:  # Костыль для закрепления чекбокса во включенном состоянии
-            CHB.setChecked(True)
+            chb.setChecked(True)
             Order.changeflag(SeparData['num'])
-        QMSG.exec_()
+        qmsg.exec_()
 
     def checkboxisclicked(self):
-        '''Checkbox clicked to change flag'''
+        #Checkbox clicked to change flag'''
         global SeparData
         Order.changeflag(SeparData['num'])
 
@@ -163,7 +161,7 @@ class Ui_MainWindow(object):
         return N
 
     def clearall(self):
-        '''Dialogbox to clear all data'''
+        #Dialogbox to clear all data
         really = QMessageBox()
         really.setIcon(QMessageBox.Question)
         really.setText('Вы действительно хотите удалить все данные?')
@@ -172,15 +170,14 @@ class Ui_MainWindow(object):
         really.exec_()
 
     def clearaction(self, btn):
-        '''ChechButton "ClearAll"'''
+        #ChechButton "ClearAll"
         if btn.text() == 'OK':
             OrderLogic.cleardb()
         else:
             pass
 
     def createtable(self):
-        '''Creating table of orders'''
-        # global flag
+        #Creating table of orders
         TableWindow = QtWidgets.QDialog()
         WinGeom = QDesktopWidget().availableGeometry()
         TableWindow.setGeometry(0, 0, WinGeom.width(), WinGeom.height()-30)
@@ -247,7 +244,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Управление заказами v 0.2"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Управление заказами v 0.9"))
         self.menufile.setTitle(_translate("MainWindow", "Файл"))
         self.action1.setText(_translate("MainWindow", "Новая запись в таблице"))
         self.action2.setText(_translate("MainWindow", "Инфо о записи"))
@@ -264,8 +261,5 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    q = QDesktopWidget().availableGeometry()
-    print("width =", q.width())
-    print("height =", q.height())
     sys.exit(app.exec_())
 
