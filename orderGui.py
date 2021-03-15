@@ -1,7 +1,7 @@
 import OrderLogic
 from OrderLogic import Order
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QVBoxLayout, QDesktopWidget
+from PyQt5.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QVBoxLayout, QDesktopWidget, QFileDialog
 
 
 class Ui_MainWindow(object):
@@ -54,7 +54,7 @@ class Ui_MainWindow(object):
         self.menufile.addSeparator()
         self.menufile.addAction(self.actionClose)
         self.menubar.addAction(self.menufile.menuAction())
-        self.action1.triggered.connect(self.addnum)
+        self.action1.triggered.connect(self.loadfile)
         self.action2.triggered.connect(self.infocheck)
         self.action3.triggered.connect(self.clearall)
         self.action4.triggered.connect(self.createtable)
@@ -151,8 +151,11 @@ class Ui_MainWindow(object):
             Order.changeflag(SeparData['num'])
         qmsg.exec_()
 
+    def loadfile(self):
+        file_name, _ = QFileDialog.getOpenFileName(caption='Open File', dir='/home')
+
     def checkboxisclicked(self):
-        # Checkbox clicked to change flag'''
+        # Checkbox clicked to change flag
         global SeparData
         Order.changeflag(SeparData['num'])
 

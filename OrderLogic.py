@@ -10,7 +10,6 @@ class Order:
         self.flag = flag
         self.cost = cost
         self.orders = args
-        self.count = 0
 
     def __repr__(self):
         return f'{self.num}, {self.name}, {self.cost}, {self.flag},{self.orders}'
@@ -23,7 +22,7 @@ class Order:
         dbfile = open('order', 'rb')
         bd = pickle.load(dbfile)
         dbfile.close()
-        bd[self - 1].flag = not bd[self - 1].flag
+        bd[self.num - 1].flag = not bd[self.num - 1].flag
         updatedb(bd)
 
     def separateOrders(self):
@@ -45,7 +44,7 @@ class Order:
                 try:
                     int(K)
                     dictoforders[f'{K}'] = 1
-                except (ValueError):
+                except ValueError:
                     a1 = a2 = 0
                     for i in K:
                         a2 += 1
